@@ -5,6 +5,7 @@ import scanpy as sc
 import scipy.sparse as sp
 import glob
 from tqdm import tqdm
+import gc  # 导入垃圾回收模块
 
 
 def load_macaque_data(file_path):
@@ -29,9 +30,10 @@ def load_macaque_data(file_path):
         obs=obs_data,  # 观测值矩阵
         var=pd.DataFrame(index=data_matrix.columns),  # 变量矩阵
         obsm=obsm_data,  # 观测值的多维数组
-        uns={'metadata': 'optional metadata can be stored here'},  # 其他未结构化数据
     )
 
+    del df, data_matrix, obs_data, spatial_data, obsm_data
+    gc.collect()
     return adata
 
 
@@ -48,3 +50,6 @@ for file_path in tqdm(macaque1):
     h5ad_filename = file_name[: file_name.rfind('round')] + 'h5ad'
 
     adata.write(h5ad_dic + h5ad_filename)
+
+    del adata
+    gc.collect()
